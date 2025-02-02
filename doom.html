@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" />
+
+<style id="webmakerstyle">
+
+</style>
+</head>
+<body>
+<!DOCTYPE html>
+
+
+<html lang="en">
+
+
+<head>
+
+
+  <meta charset="UTF-8">
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+  <title>Doom-like Game</title>
+
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+
+  <style>
+
+
+    body { margin: 0; }
+
+
+    canvas { display: block; }
+
+
+  </style>
+
+
+</head>
+
+
+<body>
+
+
+  <canvas id="canvas" width="800" height="600"></canvas>
+
+
+  <audio id="music" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" autoplay loop></audio>
+
+
+  <audio id="shoot" src="https://www.soundjay.com/mechanical/gun-gunshot-01.wav"></audio>
+
+
+  <audio id="coin" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3"></audio>
+
+
+  <div id="main-menu">
+
+
+    <h1>Doom-like Game</h1>
+
+
+    <button id="start-button">Start Game</button>
+
+
+    <button id="go-home-button" style="display: none;">Go Home to PeppaFanPig's Site</button>
+
+
+  </div>
+
+
+  <div id="score" style="display: none;">Score: 0</div>
+
+
+  <div id="game-over" style="display: none;">
+
+
+    <h1>Game Over!</h1>
+
+
+    <button id="try-again-button">Try Again</button>
+
+
+  </div>
+
+
+  <div id="music-player">
+
+
+    <a href="#" id="music-link">Change Music</a>
+
+
+    <input id="music-input" type="text" placeholder="Enter music link">
+
+
+    <button id="music-button">Play</button>
+
+
+  </div>
+
+
+  <script>
+
+
+    let scene = new THREE.Scene();
+
+
+    let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+
+    let renderer = new THREE.WebGLRenderer({
+
+
+      canvas: document.getElementById('canvas'),
+
+
+      antialias: true
+
+
+    });
+
+
+    renderer.setSize(800, 600);
+
+
+
+    // Position the camera
+
+
+    camera.position.z = 5;
+
+
+
+    // Add basic lighting
+
+
+    let ambientLight = new THREE.AmbientLight(0x444444);
+
+
+    scene.add(ambientLight);
+
+
+
+    let pointLight = new THREE.PointLight(0xffffff, 1, 100);
+
+
+    pointLight.position.set(0, 0, 5);
+
+
+    scene.add(pointLight);
+
+
+
+    // Create outside environment
+
+
+    let outside = new THREE.Group();
+
+
+    scene.add(outside);
+
+
+
+    let groundGeometry = new THREE.PlaneGeometry(10, 10);
+
+
+    let groundMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+
+
+    let ground = new THREE.Mesh(groundGeometry, groundMaterial);
+
+
+    ground.rotation.x = -Math.PI / 2;
+
+
+    outside.add(ground);
+
+
+
+    let skyGeometry = new THREE.SphereGeometry(10, 32, 16);
+
+
+    let skyMaterial = new THREE.MeshBasicMaterial({ color: 0x87CEEB });
+
+
+    let sky = new THREE.Mesh(skyGeometry, skyMaterial);
+
+
+    sky.scale.set(1.5, 1.5, 1.5);
+
+
+    outside.add(sky);
+
+
+
+    // Create chair
+
+
+    let chair = new THREE.Group();
+
+
+    scene.add(chair);
+
+
+
+    let chairGeometry = new THREE.BoxGeometry(1, 1, 1);
+
+
+    let chairMaterial = new THREE.MeshBasicMaterial({ color: 0x808080 });
+
+
+    let chairMesh = new THREE.Mesh(chairGeometry, chairMaterial);
+
+
+    chairMesh.position.set(0, -1, 0);
+
+
+    chair.add(chairMesh);
+
+
+
+    // Create computer
+
+
+    let computer = new THREE.Group();
+
+
+    scene.add(computer);
+
+
+
+    let computerGeometry = new THREE.BoxGeometry(1, 0.5, 1);
+
+
+    let computerMaterial = new THREE.MeshBasicMaterial({ color: 0x808080 });
+
+
+    let computerMesh = new THREE.Mesh(computerGeometry, computerMaterial);
+
+
+    computerMesh.position.set(0, -0.5, 0);
+
+
+    computer.add(computerMesh);
+
+
+
+    // Create hand
+
+
+    let hand = new THREE.Group();
+
+
+    scene.add(hand);
+
+
+
+    let handGeometry = new THREE.SphereGeometry(0.2, 32, 16);
+
+
+    let handMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+
+
+    let handMesh = new THREE.Mesh(handGeometry, handMaterial);
+
+
+    handMesh.position.set(0, -0.5, 0);
+
+
+    hand.add(handMesh);
+
+
+
+    // Create gun
+
+
+    let gun = new THREE.Group();
+
+
+    scene.add(gun);
+
+
+
+    let gunGeometry = new THREE.CylinderGeometry(0.1, 0.1, 1, 32);
+
+
+    let gunMaterial = new THREE.MeshBasicMaterial({ color: 0x000000 });
+
+
+    let gunMesh = new THREE.Mesh(gunGeometry, gunMaterial);
+
+
+    gunMesh.position.set(0, 0, 0);
+
+
+    gun.add(gunMesh);
+
+
+
+    // Create bullet
+
+
+    let bullet = new THREE.Group();
+
+
+    scene.add(bullet);
+
+
+
+    let bulletGeometry = new THREE.SphereGeometry(0.1, 32, 16);
+
+
+    let bulletMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+
+
+    let bulletMesh = new THREE.Mesh(bulletGeometry, bulletMaterial);
+
+
+    bullet.add(bulletMesh);
+
+
+
+    // Create Peppa Pigs
+
+
+    let peppaPigs = [];
+
+
+    for (let i = 0; i < 5; i++) {
+
+
+      let peppaPig = new THREE.Group();
+
+
+      scene.add(peppaPig);
+
+
+
+      let bodyGeometry = new THREE.SphereGeometry(0.5, 32, 16);
+
+
+      let bodyMaterial = new THREE.MeshBasicMaterial({ color: 0x87CEEB });
+
+
+      let body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+
+
+      peppaPig.add(body);
+
+
+
+      let earGeometry = new THREE.SphereGeometry(0.2, 32, 16);
+
+
+      let earMaterial = new THREE.MeshBasicMaterial({ color: 0x87CEEB });
+
+
+      let ear1 = new THREE.Mesh(earGeometry, earMaterial);
+
+
+      ear1.position.set(-0.3, 0.5, 0);
+
+
+      peppaPig.add(ear1);
+
+
+
+      let ear2 = new THREE.Mesh(earGeometry, earMaterial);
+
+
+      ear2.position.set(0.3, 0.5, 0);
+
+
+      peppaPig.add(ear2);
+
+
+
+      peppaPig.position.set(Math.random() * 10 - 5, Math.random() * 10 - 5, Math.random() * 10 - 5);
+
+
+      peppaPigs.push(peppaPig);
+
+
+    }
+
+
+
+    // Movement variables
+
+
+    let moveForward = false;
+
+
+    let moveBackward = false;
+
+
+    let moveLeft = false;
+
+
+    let moveRight = false;
+
+
+
+    // Mouse movement variables
+
+
+    let mouseMoveX = 0;
+
+
+    let mouseMoveY = 0;
+
+
+
+    // Score
+
+
+    let score = 0;
+
+
+
+    // Game started
+
+
+    let gameStarted = false;
+
+
+
+    // Game over
+
+
+    let gameOver = false;
+
+
+
+    document.getElementById('start-button').addEventListener('click', () => {
+
+
+      gameStarted = true;
+
+
+      document.getElementById('main-menu').style.display = 'none';
+
+
+      document.getElementById('score').style.display = 'block';
+
+
+      document.getElementById('go-home-button').style.display = 'block';
+
+
+    });
+
+
+
+    document.getElementById('go-home-button').addEventListener('click', () => {
+
+
+      window.location.href = 'index.html';
+
+
+    });
+
+
+
+    document.getElementById('try-again-button').addEventListener('click', () => {
+
+
+      gameOver = false;
+
+
+      document.getElementById('game-over').style.display = 'none';
+
+
+      document.getElementById('score').style.display = 'block';
+
+
+      score = 0;
+
+
+      document.getElementById('score').innerHTML = 'Score: ' + score;
+
+
+      for (let i = 0; i < peppaPigs.length; i++) {
+
+
+        let peppaPig = peppaPigs[i];
+
+
+        peppaPig.position.set(Math.random() * 10 - 5, Math.random() * 10 - 5, Math.random() * 10 - 5);
+
+
+      }
+
+
+    });
+
+
+
+    document.getElementById('music-button').addEventListener('click', () => {
+
+
+      let musicLink = document.getElementById('music-input').value;
+
+
+      document.getElementById('music').src = musicLink;
+
+
+    });
+
+
+
+    document.addEventListener('keydown', (event) => {
+
+
+      if (gameStarted) {
+
+
+        switch (event.key) {
+
+
+          case 'ArrowUp':
+
+
+            moveForward = true;
+
+
+            break;
+
+
+          case 'ArrowDown':
+
+
+            moveBackward = true;
+
+
+            break;
+
+
+          case 'ArrowLeft':
+
+
+            moveLeft = true;
+
+
+            break;
+
+
+          case 'ArrowRight':
+
+
+            moveRight = true;
+
+
+            break;
+
+
+          case ' ':
+
+
+            // Shoot bullet
+
+
+            bullet.position.set(camera.position.x, camera.position.y, camera.position.z);
+
+
+            bulletMesh.position.set(0, 0, 0);
+
+
+            let bulletVelocity = 5;
+
+
+            let bulletDirection = new THREE.Vector3(0, 0, -1);
+
+
+            bulletDirection.applyQuaternion(camera.quaternion);
+
+
+            bullet.position.x += bulletDirection.x * bulletVelocity;
+
+
+            bullet.position.y += bulletDirection.y * bulletVelocity;
+
+
+            bullet.position.z += bulletDirection.z * bulletVelocity;
+
+
+            document.getElementById('shoot').play();
+
+
+            break;
+
+
+          case 's':
+
+
+            // Sit on chair
+
+
+            camera.position.set(0, -1, 0);
+
+
+            // Open computer emulator
+
+
+            let emulator = window.open('https://98.js.org', '_blank');
+
+
+            break;
+
+
+          case 'b':
+
+
+            // Go back to game
+
+
+            camera.position.set(0, 0, 5);
+
+
+            break;
+
+
+        }
+
+
+      }
+
+
+    });
+
+
+
+    document.addEventListener('keyup', (event) => {
+
+
+      if (gameStarted) {
+
+
+        switch (event.key) {
+
+
+          case 'ArrowUp':
+
+
+            moveForward = false;
+
+
+            break;
+
+
+          case 'ArrowDown':
+
+
+            moveBackward = false;
+
+
+            break;
+
+
+          case 'ArrowLeft':
+
+
+            moveLeft = false;
+
+
+            break;
+
+
+          case 'ArrowRight':
+
+
+            moveRight = false;
+
+
+            break;
+
+
+        }
+
+
+      }
+
+
+    });
+
+
+
+    document.addEventListener('mousemove', (event) => {
+
+
+      mouseMoveX = event.clientX;
+
+
+      mouseMoveY = event.clientY;
+
+
+    });
+
+
+
+    function animate() {
+
+
+      requestAnimationFrame(animate);
+
+
+      if (gameStarted) {
+
+
+        if (moveForward) {
+
+
+          camera.position.z -= 0.1;
+
+
+        }
+
+
+        if (moveBackward) {
+
+
+          camera.position.z += 0.1;
+
+
+        }
+
+
+        if (moveLeft) {
+
+
+          camera.position.x -= 0.1;
+
+
+        }
+
+
+        if (moveRight) {
+
+
+          camera.position.x += 0.1;
+
+
+        }
+
+
+        camera.rotation.x = (mouseMoveY / window.innerHeight) * Math.PI - Math.PI / 2;
+
+
+        camera.rotation.y = (mouseMoveX / window.innerWidth) * Math.PI - Math.PI / 2;
+
+
+
+        // Update bullet position
+
+
+        if (bullet.position.z < -10) {
+
+
+          bullet.position.set(camera.position.x, camera.position.y, camera.position.z);
+
+
+          bulletMesh.position.set(0, 0, 0);
+
+
+        } else {
+
+
+          bullet.position.z -= 0.1;
+
+
+        }
+
+
+
+        // Check for collision with Peppa Pigs
+
+
+        for (let i = 0; i < peppaPigs.length; i++) {
+
+
+          let peppaPig = peppaPigs[i];
+
+
+          let distance = bullet.position.distanceTo(peppaPig.position);
+
+
+          if (distance < 0.5) {
+
+
+            peppaPig.position.set(Math.random() * 10 - 5, Math.random() * 10 - 5, Math.random() * 10 - 5);
+
+
+            score++;
+
+
+            document.getElementById('score').innerHTML = 'Score: ' + score;
+
+
+          }
+
+
+        }
+
+
+
+        // Check for game over
+
+
+        for (let i = 0; i < peppaPigs.length; i++) {
+
+
+          let peppaPig = peppaPigs[i];
+
+
+          let distance = camera.position.distanceTo(peppaPig.position);
+
+
+          if (distance < 0.5) {
+
+
+            gameOver = true;
+
+
+            document.getElementById('game-over').style.display = 'block';
+
+
+            document.getElementById('score').style.display = 'none';
+
+
+          }
+
+
+        }
+
+
+
+        // Animate Peppa Pigs
+
+
+        for (let i = 0; i < peppaPigs.length; i++) {
+
+
+          let peppaPig = peppaPigs[i];
+
+
+          peppaPig.rotation.y += 0.01;
+
+
+        }
+
+
+      }
+
+
+      if (gameOver) {
+
+
+        document.getElementById('game-over').style.display = 'block';
+
+
+        document.getElementById('score').style.display = 'none';
+
+
+      }
+
+
+      renderer.render(scene, camera);
+
+
+    }
+
+
+    animate();
+
+
+  </script>
+
+
+</body>
+
+
+</html>
+
+
+
+
+<html>
+
+
+<head>
+
+
+<title>Go Back Button</title>
+
+
+</head>
+
+
+<body>
+
+
+
+<button onclick="goBack()">Go Back</button>
+
+
+
+<script>
+
+
+function goBack() {
+
+
+  window.location.href = "index.html"; // Redirect to index.html
+
+
+  // OR, if you want to use history:
+
+
+  // window.history.back(); // Go back one page in history
+
+
+}
+
+
+</script>
+
+
+
+</body>
+
+
+</html> 
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Styled Container</title>
+    <style> <div style="overflow: hidden; width: 1536px; height: 481px; position: absolute; top: 0px; perspective: 762.769px;"><div style="transform-style: preserve-3d; pointer-events: none; width: 1536px; height: 481px; transform: translateZ(762.769px) matrix3d(0.839285, -0.235034, -0.490265, 0, 0, -0.901733, 0.432293, 0, 0.543692, 0.362817, 0.756811, 0, 0, -901.733, -25994.4, 1) translate(768px, 240.5px);"><div style="width: 1280px; height: 1024px; opacity: 1; background: rgb(29, 46, 47); position: absolute; pointer-events: auto; user-select: none; transform: translate(-50%, -50%) matrix3d(1, 0, 0, 0, 0, -0.99863, 0.052336, 0, 0, 0.052336, 0.99863, 0, 0, 950, 255, 1);" draggable="false"><iframe src="https://os.henryheffernan.com/" style="width: 1280px; height: 1024px; padding: 32px; box-sizing: border-box; opacity: 1;" class="jitter" id="computer-screen" frameborder="0" title="HeffernanOS"></iframe></div></div></div> <div id="ui" style="pointer-events: none;"><div id="ui-app"><div style="position: absolute; bottom: 64px; background: black; padding: 4px 16px; text-align: center; display: flex; align-items: flex-end; opacity: 0; transform: translateY(12px) translateZ(0px);"><p>Click anywhere to begin</p><div style="margin-left: 8px; padding-bottom: 2px; padding-right: 4px;"><div class="blinking-cursor"></div></div></div><div style="background-color: black; width: 100%; height: 100%; display: flex; transition-property: opacity, transform; transition-duration: 0.2s, 0.2s; transition-timing-function: ease-in-out; transition-delay: 0s, 0s; transition-behavior: normal, normal; box-sizing: border-box; font-size: 16px; letter-spacing: 0.8px; opacity: 0; transform: scale(1.1);"><div style="width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: space-between; opacity: 0;"><div style="width: 100%; box-sizing: border-box; display: flex; flex-direction: row;" class="loading-screen-header"><div style="display: flex; flex-direction: row;"><div><p><b>Heffernan,</b> </p><p><b>Henry Inc.</b></p></div></div><div style="margin-left: 64px;"><p>Released: 01/13/2000</p><p>HHBIOS (C)2000 Heffernan Henry Inc.,</p></div></div><div style="flex: 1 1 0%; display: flex; width: 100%; box-sizing: border-box; flex-direction: column;" class="loading-screen-body"><p>HSP S13 2000-2022 Special UC131S</p><div style="height: 16px;"></div><p>HSP Showcase(tm) XX 113</p><p>Checking RAM : 1400
+         
+
+
+</body>
+</html>
