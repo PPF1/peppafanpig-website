@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" />
+
+<style id="webmakerstyle">
+
+</style>
+</head>
+<body>
+<!DOCTYPE html>
+<html>
+<head>
+<title>Peppa Pig Video Player</title>
+<style>
+body {
+    background-color: #008080;
+    font-family: "Courier New", monospace;
+    color: #FFFF00;
+    margin: 0;
+    padding: 0;
+}
+</style>
+</head>
+<body>
+
+<h1>Peppa Pig Video Player</h1>
+
+<p>Please enter the URL of the Peppa Pig video you want to play and mp4 files from the app</p>
+
+<input type="text" id="videoUrl" size="80">
+<button onclick="playVideo()">Play</button>
+
+<div id="player"></div>
+
+<p><a href="index.html">Go back</a></p>
+
+<script>
+function playVideo() {
+    var videoUrl = document.getElementById("videoUrl").value;
+
+    // Create a new video element
+    var video = document.createElement('video');
+    video.id = 'videoPlayer';
+    video.width = '640';
+    video.height = '360';
+    video.controls = true;
+
+    // Create a source element for the video
+    var source = document.createElement('source');
+    source.src = videoUrl;
+
+    // Append the source to the video element
+    video.appendChild(source);
+
+    // Get the player container
+    var playerContainer = document.getElementById('player');
+
+    // Clear any existing content
+    playerContainer.innerHTML = '';
+
+    // Append the video element to the container
+    playerContainer.appendChild(video);
+}
+</script>
+
+</body>
+</html>
+
+
+</body>
+</html>
