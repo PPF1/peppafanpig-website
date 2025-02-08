@@ -54,14 +54,25 @@ a:hover {
     color: #FFFFFF;
 }
 
-.game-button { /* Style for the Doom game button */
-    background-color: #FF0000; /* Red for Doom! */
+.game-button {
+    background-color: #FF0000;
     color: #FFFFFF;
     padding: 10px 20px;
     border: none;
     cursor: pointer;
     font-family: "Courier New", monospace;
-    margin-top: 10px; /* Add some spacing */
+    margin-top: 10px;
+}
+
+.countdown {
+    margin-top: 10px;
+    color: #FFFFFF;
+}
+
+.youtube-announcement {
+    margin-top: 10px;
+    color: #FFFFFF;
+    text-align: center; /* Center the announcement */
 }
 </style>
 </head>
@@ -71,12 +82,11 @@ a:hover {
     <h1>PeppaFanPig</h1>
 
     <img src="https://media.tenor.com/0hXw4nLFV30AAAAM/peppa-pig.gif" alt="Peppa Pig GIF">
-    
 
     <p>Welcome to the most awesome Peppa Pig fan site on the web! This page is dedicated to all things Peppa! Join the fun!</p>
 
     <h2>Downloads</h2>
-    <a href="https://ia600807.us.archive.org/11/items/PeppaPigThemeSoundWAV/peppa.wav" download> <button class="download-button">Peppa Pig Theme Sound WAV</button></a><br><br>
+    <a href="https://ia600807.us.archive.org/11/items/PeppaPigThemeSoundWAV/peppa.wav" download><button class="download-button">Peppa Pig Theme Sound WAV</button></a><br><br>
     <p>Peppa Pig MIDI Song (Plays on loop - no controls):</p>
     <audio autoplay loop>
         <source src="https://archive.org/download/PeppaPigThemeSongMIDI/Peppa%20pig%20theme%20song%20.mid" type="audio/midi">
@@ -93,9 +103,47 @@ a:hover {
         <li><a href="game2.html">George's Dinosaur Rescue</a></li>
     </ul>
 
-    <a href="doom.html"><button class="game-button">Play Doom-Like-Game!</button></a> <br> <br> <h2>Peppa Pig Video Player</h2>
+    <a href="doom.html"><button class="game-button">Play Doom-Like-Game!</button></a> <br> <br>
+
+    <h2>Peppa Pig Video Player</h2>
 
     <p>Watch Peppa Pig videos here: <a href="video_player.html">Peppa Pig Video Player</a></p>
 
-    <h2>Join the Community!</h2>
-    <a href="https://www.facebook.com/peppafanpig" target="_blank">Join us on Facebook!</a><br>
+    <h2>Join VCF SoCal With Peppa Pig</h2>
+    <a href="https://www.vcfsocal.com/" target="_blank">Join us on VCF SoCal!</a><br>
+
+    <div class="footer">
+        Join VCF Socal With Peppa Pig At Feb 15 2025 9:00 AM
+        <div class="countdown" id="countdown"></div>
+        <div class="youtube-announcement">YouTube Channel is Coming Soon On Feb/15/2025 Made it on IMovie</div>
+    </div>
+</div>
+
+<script>
+    const countdownDisplay = document.getElementById('countdown');
+    const targetDate = new Date('February 15, 2025 09:00:00');
+
+    function updateCountdown() {
+        const now = new Date();
+        const timeLeft = targetDate.getTime() - now.getTime();
+
+        if (timeLeft <= 0) {
+            countdownDisplay.innerHTML = "It's time!";
+            clearInterval(countdownInterval);
+            return;
+        }
+
+        const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+
+        countdownDisplay.innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+    }
+
+    updateCountdown();
+    const countdownInterval = setInterval(updateCountdown, 1000);
+</script>
+
+</body>
+</html>
